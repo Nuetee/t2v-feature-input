@@ -30,7 +30,7 @@ def compute_vqa_scores(raw_images=None, img_features=None, raw_texts=None, input
             image_features=image_features,
             text_features=txt_feat,
         )
-        scores[i, j] = score.item()
+        scores[:, j] = score.item()
 
     return scores
 
