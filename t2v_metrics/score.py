@@ -41,23 +41,27 @@ class Score(nn.Module):
         pass
 
     def forward(self,
-                images: Union[str, List[str]],
-                texts: Union[str, List[str]],
-                image_features: torch.Tensor = None,  # NEW: 직접 feature 입력 가능
-                text_features: torch.Tensor = None,  # NEW: 직접 토큰 입력 가능
+                # images: Union[str, List[str]],
+                # texts: Union[str, List[str]],
+                image_features: Union[torch.Tensor, List[torch.Tensor]] = None,  # NEW: 직접 feature 입력 가능
+                # text_features: Union[torch.Tensor, List[torch.Tensor]] = None,  # NEW: 직접 토큰 입력 가능
+                input_ids: Union[torch.Tensor, List[torch.Tensor]] = None,  # NEW: 직접 토큰 입력 가능
+                labels: Union[torch.Tensor, List[torch.Tensor]] = None,  # NEW: 직접 토큰 입력 가능
                 **kwargs) -> torch.Tensor:
         """Return the similarity score(s) between the image(s) and the text(s)
         If there are m images and n texts, return a m x n tensor
         """
-        if type(images) == str:
-            images = [images]
-        if type(texts) == str:
-            texts = [texts]
-        
-        scores = torch.zeros(len(images), len(texts)).to(self.device)
+        if type(image_features) == torch.Tensor:
+            image_features = [image_features]
+        if type(input_ids) == torch.Tensor:
+            input_ids = [input_ids]
+        if type(labels) == torch.Tensor:
+            labels = [labels]
 
-        for i, image in enumerate(images):
-            scores[i] = self.model.forward([image] * len(texts), texts, **kwargs)
+        scores = torch.zeros(len(image_features), len(input_ids)).to(self.device)
+
+        for i, image in enumerate(image_features):
+            scores[i] = self.model.forward([image] * len(input_ids), input_ids, labels, **kwargs)
         return scores
         # M = len(images)
         # N = len(texts)

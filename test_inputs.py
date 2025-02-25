@@ -20,8 +20,8 @@ def compute_vqa_scores(raw_images=None, img_features=None, raw_texts=None, input
     """ 네 가지 입력 방식에 대해 VQAScore를 개별적으로 계산하여 OOM 방지 """
     # M = len(image_paths)
     # N = len(texts)
-    M = len(image_features.shape[0])
-    N = len(input_ids.shape[0])
+    M = image_features.shape[0]
+    N = input_ids.shape[0]
     scores = torch.zeros((M, N)).to(device)  # 빈 score 텐서 생성
 
     for i in range(M):

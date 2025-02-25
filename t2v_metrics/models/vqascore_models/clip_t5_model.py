@@ -220,20 +220,22 @@ class CLIPT5Model(VQAScoreModel):
     def forward(self,
                 # images: List[str],
                 # texts: List[str],
-                image_features: torch.Tensor = None,  # NEW: 직접 feature 입력 가능
-                text_features: torch.Tensor = None,  # NEW: 직접 토큰 입력 가능
+                image_features: List[torch.Tensor] = None,  # NEW: 직접 feature 입력 가능
+                input_ids: List[torch.Tensor] = None,  # NEW: 직접 토큰 입력 가능
+                labels: List[torch.Tensor] = None,  # NEW: 직접 토큰 입력 가능
                 question_template: str=default_question_template,
                 answer_template: str=default_answer_template) -> torch.Tensor:
         """Forward pass of the model to return n scores for n (image, text) pairs (in PyTorch Tensor)
         """
         assert (image_features is not None), "image_features must be provided."
-        assert (text_features is not None), "text_features must be provided."
+        assert (input_ids is not None), "text_features must be provided."
+        assert (labels is not None), "text_features must be provided."
 
 
-        input_ids = text_features.get("input_ids", None)  # ✅ 미리 저장된 토큰을 직접 사용
-        labels = text_features.get("labels", None)
+        input_ids = torch.cat(input_ids, dim=0)  # ✅ 미리 저장된 토큰을 직접 사용
+        labels = torch.cat(labels, dim=0)
 
-        images = image_features  # 미리 추출된 feature 사용
+        images = torch.cat(image_features, dim=0)  # 미리 추출된 feature 사용
 
         attention_mask = input_ids.ne(self.tokenizer.pad_token_id)
         decoder_attention_mask = labels.ne(IGNORE_INDEX)

@@ -14,8 +14,8 @@ labels = torch.load("labels.pt").to(device)  # ✅ (N, sequence_length)
 # ✅ 4️⃣ OOM 방지를 위해 for문을 사용한 개별 실행
 def compute_vqa_scores(raw_images=None, img_features=None, raw_texts=None, input_ids=None, labels=None):
     """ 네 가지 입력 방식에 대해 VQAScore를 개별적으로 계산하여 OOM 방지 """
-    M = len(image_features.shape[0])
-    N = len(input_ids.shape[0])
+    M = image_features.shape[0]
+    N = input_ids.shape[0]
     scores = torch.zeros((M, N)).to(device)  # 빈 score 텐서 생성
 
 
@@ -25,7 +25,7 @@ def compute_vqa_scores(raw_images=None, img_features=None, raw_texts=None, input
             "input_ids": input_ids[j].unsqueeze(0),  # (1, sequence_length)
             "labels": labels[j].unsqueeze(0)  # (1, sequence_length)
         }
-
+        import pdb;pdb.set_trace()
         score = vqa_model.forward(
             image_features=image_features,
             text_features=txt_feat,
